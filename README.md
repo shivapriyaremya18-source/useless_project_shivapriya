@@ -2,7 +2,7 @@
 
 
 
-# [Project Name] 🎯
+# [Shivapriya] 🎯
 
 
 ## Basic Details
@@ -63,7 +63,7 @@ Main Blob interface showing the virtual pet, interaction buttons, mood, and over
 Blob's outfit section showing the different accessories and outfits available for the pet.
 
 
-![<img width="1920" height="1020" alt="3" src="https://github.com/user-attachments/assets/1ba39404-5766-40b4-8883-d73ec2b4c9e2" />
+![<img width="1920" height="1020" alt="3" src="https://github.com/user-attachments/assets/1e7c9d5d-bdeb-4490-a0d1-b4d842a5074d" />
 ](judgement)
 Daily Verdict showing Blob's judgment, interaction statistics, roast, and meme evidence.
 
@@ -74,7 +74,7 @@ Basic workflow showing user interaction → Blob's memory → mood/verdict calcu
 For Hardware:
 
 ## Team Contributions
-- [Name 1]: Project concept, UI/UX design, feature planning, implementation, testing, interaction design, Blob's personality, verdict system, outfit system, and overall project development.
+- [Shivapriya]: Project concept, UI/UX design, feature planning, implementation, testing, interaction design, Blob's personality, verdict system, outfit system, and overall project development.
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
