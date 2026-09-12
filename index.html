@@ -1,1 +1,1440 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Blob the Pet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-top: #FFFAEC;
+            --bg-bottom: #FFF1CE;
+            --panel: #FFFDF8;
+            --ink: #6B5744;
+            --ink-light: #A8967F;
+            --pet-base: #FFDCA8;
+            --pet-shine: #FFF3D9;
+            --feed: #FFD8AE;
+            --feed-shadow: rgba(214, 141, 74, 0.35);
+            --play: #BCEAD5;
+            --play-shadow: rgba(58, 150, 116, 0.3);
+            --petbtn: #FFC7D6;
+            --petbtn-shadow: rgba(214, 92, 128, 0.3);
+            --sleep: #D9CFF6;
+            --sleep-shadow: rgba(112, 90, 189, 0.3);
+            --shadow: rgba(107, 79, 63, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle, rgba(107, 79, 63, 0.05) 1.5px, transparent 1.5px) 0 0/26px 26px,
+                linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+            font-family: 'Nunito', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 24px;
+            max-width: 780px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .card {
+            flex: 1;
+            width: 100%;
+            max-width: 380px;
+            background: var(--panel);
+            border-radius: 28px;
+            padding: 28px 24px 24px;
+            box-shadow: 0 24px 48px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
+
+        .verdict-card {
+            flex: 1;
+            width: 100%;
+            max-width: 360px;
+            background: var(--panel);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 24px 48px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0 0 2px;
+            font-size: 26px;
+            letter-spacing: 0.2px;
+        }
+
+        .tagline {
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 2px;
+            opacity: 0.75;
+        }
+
+        .subtitle {
+            color: var(--ink-light);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stage {
+            position: relative;
+            height: 210px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .speech-bubble {
+            position: absolute;
+            top: 4px;
+            background: var(--panel);
+            border-radius: 18px;
+            padding: 9px 16px;
+            font-weight: 700;
+            color: var(--ink);
+            font-size: 14px;
+            box-shadow: 0 6px 14px var(--shadow);
+            max-width: 240px;
+            transition: opacity 0.15s ease;
+            z-index: 2;
+        }
+
+        .speech-bubble::after {
+            content: "";
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 7px 7px 0 7px;
+            border-style: solid;
+            border-color: var(--panel) transparent transparent transparent;
+        }
+
+        .platform {
+            position: absolute;
+            bottom: 14px;
+            width: 130px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--shadow);
+            filter: blur(6px);
+            opacity: 0.5;
+        }
+
+        .pet {
+            width: 156px;
+            height: 156px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, var(--pet-shine), var(--pet-base) 65%);
+            box-shadow: 0 14px 0 -6px var(--shadow), 0 18px 24px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            z-index: 0;
+            /* creates a private layering context for outfit pieces below */
+        }
+
+        .outfit-hat {
+            /* Treating Blob's circle as a clock face: 1:45 is 52.5°
+               clockwise from 12 o'clock (1.75 hours * 30° per hour).
+               Offset from center = radius * sin(52.5°) horizontally and
+               radius * cos(52.5°) vertically. Using ~52% of the box as
+               the radius gives the hat a slight overhang past the rim. */
+            position: absolute;
+            top: 18%;
+            /* 50% - (52% * cos 52.5° ≈ 0.609) */
+            left: 91%;
+            /* 50% + (52% * sin 52.5° ≈ 0.793) */
+            transform: translate(-50%, -50%) rotate(-14deg);
+            font-size: 38px;
+            pointer-events: none;
+            z-index: 6;
+            filter: drop-shadow(0 2px 4px var(--shadow));
+            user-select: none;
+        }
+
+        /* Base accessory div: only shared, non-positional styles here.
+           Each accessory type below sets its OWN top/left/size/z-index,
+           since sunglasses, a bow, a scarf and wings all attach to
+           completely different parts of Blob. */
+        .outfit-acc {
+            position: absolute;
+            pointer-events: none;
+            filter: drop-shadow(0 2px 4px var(--shadow));
+            user-select: none;
+        }
+
+        /* Sunglasses: sit directly across the eyes, in front of the face */
+        .outfit-acc.acc-shades {
+            top: 42%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 110px;
+            z-index: 4;
+            /* above the face (2), below hat (6) */
+        }
+
+        /* Bow: perched near the top-side of the head, like a hair clip */
+        .outfit-acc.acc-bow {
+            top: 4%;
+            left: 74%;
+            transform: translate(-50%, -50%) rotate(-8deg);
+            font-size: 28px;
+            z-index: 5;
+        }
+
+        /* Scarf: wrapped around the lower part of Blob's round body */
+        .outfit-acc.acc-scarf {
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            z-index: 3;
+            /* in front of the body, but doesn't need to beat the face */
+        }
+
+        /* Wings: large and centered, but layered BEHIND the face so they
+           read as sprouting from behind Blob instead of sitting on top of it */
+        .outfit-acc.acc-wings {
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 84px;
+            z-index: 1;
+            /* behind pet-face (2) */
+            opacity: 0.95;
+        }
+
+        .mood-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #FFF7E8;
+            border: 1.5px solid #E8D9C5;
+            border-radius: 16px;
+            padding: 5px 14px;
+            margin-bottom: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink-light);
+        }
+
+        .mood-badge {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        /* Dress Blob Styling */
+        .dress-container {
+            margin-top: 14px;
+            padding: 16px;
+            background: #FFF7E8;
+            border-radius: 22px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dress-header h2 {
+            margin: 0;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .clear-outfit-btn {
+            background: transparent;
+            border: 1.5px solid #E8D9C5;
+            color: var(--ink-light);
+            border-radius: 12px;
+            padding: 3px 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clear-outfit-btn:hover {
+            background: #FFD8AE;
+            color: var(--ink);
+            border-color: #D99A70;
+        }
+
+        .outfit-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .group-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--ink-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .outfit-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .outfit-chip {
+            background: var(--panel);
+            border: 1.5px solid #E8D9C5;
+            border-radius: 14px;
+            padding: 5px 10px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .outfit-chip:hover {
+            border-color: #D99A70;
+            background: #FFF0D6;
+            transform: translateY(-1px);
+        }
+
+        .outfit-chip.active {
+            background: #D99A70;
+            color: #FFF;
+            border-color: #C58860;
+        }
+
+        /* Daily Verdict Card Styling */
+        .verdict-header h3 {
+            margin: 0;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .verdict-teaser {
+            padding: 24px 16px;
+            background: #FFF7E8;
+            border-radius: 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lock-icon {
+            font-size: 32px;
+        }
+
+        .verdict-teaser p {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink-light);
+        }
+
+        .reveal-btn {
+            background: var(--sleep);
+            color: var(--ink);
+            border: none;
+            border-radius: 18px;
+            padding: 10px 18px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 0 -1px var(--sleep-shadow);
+            transition: all 0.15s ease;
+            width: 100%;
+        }
+
+        .reveal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .reveal-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .verdict-content {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-badge {
+            background: #FFF7E8;
+            border: 2px dashed #E8D9C5;
+            border-radius: 16px;
+            padding: 8px 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+        }
+
+        .verdict-quote {
+            background: #FFFDF8;
+            border-left: 4px solid #D99A70;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            font-style: italic;
+            box-shadow: 0 3px 8px var(--shadow);
+            text-align: left;
+        }
+
+        .meme-container {
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        .meme-label {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-light);
+            margin-bottom: 6px;
+        }
+
+        .meme-box {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #FFF7E8;
+            border: 2px solid #E8D9C5;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meme-box img {
+            width: 100%;
+            height: auto;
+            max-height: 380px;
+            object-fit: contain;
+            border-radius: 16px;
+            display: block;
+        }
+
+        .meme-fallback {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 20px;
+            color: var(--ink-light);
+        }
+
+        .meme-icon {
+            font-size: 32px;
+        }
+
+        .meme-caption {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Blob's Roast Box */
+        .blob-roast-box {
+            background: #FFF7E8;
+            border: 1.5px solid #E8D9C5;
+            border-radius: 16px;
+            padding: 10px 14px;
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        .blob-roast-tag {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: #D97A53;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .blob-roast-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.35;
+        }
+
+        .re-lock-btn {
+            background: transparent;
+            border: 1.5px solid #E8D9C5;
+            color: var(--ink-light);
+            border-radius: 14px;
+            padding: 6px 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 4px;
+        }
+
+        .re-lock-btn:hover {
+            background: #FFF7E8;
+            color: var(--ink);
+        }
+
+        /* =====================================================
+           FIXES: these rules existed in an earlier version but
+           were missing here, which is why the emoji looked tiny
+           and nothing visibly animated on click.
+           ===================================================== */
+        .pet-face {
+            font-size: 68px;
+            line-height: 1;
+            position: relative;
+            z-index: 2;
+            /* above wings, below the accessories/hat that sit in front */
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .bubble-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--ink);
+            border: none;
+            border-radius: 20px;
+            padding: 14px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .bubble-btn .icon {
+            font-size: 20px;
+        }
+
+        .bubble-btn.feed {
+            background: var(--feed);
+            box-shadow: 0 8px 0 -2px var(--feed-shadow);
+        }
+
+        .bubble-btn.play {
+            background: var(--play);
+            box-shadow: 0 8px 0 -2px var(--play-shadow);
+        }
+
+        .bubble-btn.petbtn {
+            background: var(--petbtn);
+            box-shadow: 0 8px 0 -2px var(--petbtn-shadow);
+        }
+
+        .bubble-btn.sleep {
+            background: var(--sleep);
+            box-shadow: 0 8px 0 -2px var(--sleep-shadow);
+        }
+
+        .bubble-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .bubble-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .pet.bounce {
+            animation: bounce 0.45s ease;
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: scale(1) translateY(0);
+            }
+
+            30% {
+                transform: scale(1.1, 0.9) translateY(4px);
+            }
+
+            60% {
+                transform: scale(0.95, 1.05) translateY(-3px);
+            }
+
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .pet.squish {
+            animation: squish 0.4s ease;
+        }
+
+        @keyframes squish {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.15, 0.85);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pet.spin {
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg) scale(1);
+            }
+
+            50% {
+                transform: rotate(180deg) scale(1.08);
+            }
+
+            100% {
+                transform: rotate(360deg) scale(1);
+            }
+        }
+
+        .pet.sleepy {
+            animation: sleepy 0.6s ease;
+        }
+
+        @keyframes sleepy {
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(0.96) rotate(-3deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .floating-emote {
+            position: absolute;
+            font-size: 22px;
+            pointer-events: none;
+            animation: floatUp 1s ease forwards;
+            z-index: 6;
+        }
+
+        /* =====================================================
+           🐤 WANDERING DUCKS EASTER EGG STYLES
+           ===================================================== */
+        .wandering-duck {
+            position: fixed;
+            font-size: 24px;
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+            transition: transform 0.2s ease;
+            animation: duckWaddle 0.5s infinite alternate ease-in-out;
+            will-change: left, top, transform;
+        }
+
+        @keyframes duckWaddle {
+            0% {
+                transform: translateY(0) rotate(-4deg);
+            }
+
+            100% {
+                transform: translateY(-4px) rotate(4deg);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .wandering-duck {
+                animation: none;
+                transition: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="card">
+            <h1>Blob</h1>
+
+            <div class="subtitle">the most demanding pet ;)</div>
+
+            <!-- Blob's Mood Badge -->
+            <div class="mood-container">
+                <span>Blob's Mood:</span>
+                <span id="moodBadge" class="mood-badge">😏 Sassy</span>
+            </div>
+
+            <div class="stage" id="stage">
+                <div class="speech-bubble" id="speech">Oh. It's you.</div>
+                <div class="platform"></div>
+                <div class="pet" id="pet" onclick="react('pet')">
+                    <div class="outfit-hat" id="outfitHat"></div>
+                    <div class="pet-face" id="face">😏</div>
+                    <div class="outfit-acc" id="outfitAcc"></div>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="bubble-btn feed" onclick="react('feed')">
+                    <span class="icon">🍎</span> Feed
+                </button>
+                <button class="bubble-btn play" onclick="react('play')">
+                    <span class="icon">🎾</span> Play
+                </button>
+                <button class="bubble-btn petbtn" onclick="react('pet')">
+                    <span class="icon">✋</span> Pet
+                </button>
+                <button class="bubble-btn sleep" onclick="react('sleep')">
+                    <span class="icon">💤</span> Sleep
+                </button>
+            </div>
+
+            <!-- Dress Blob Section -->
+            <div class="dress-container">
+                <div class="dress-header">
+                    <h2>Dress Blob 👕</h2>
+                    <button class="clear-outfit-btn" onclick="setOutfit('none')" title="Remove all outfits">Remove
+                        All</button>
+                </div>
+
+                <div class="outfit-group">
+                    <span class="group-title">Hats</span>
+                    <div class="outfit-chips">
+                        <button class="outfit-chip" data-category="hat" data-value="👑"
+                            onclick="setOutfit('hat', '👑')">👑 Crown</button>
+                        <button class="outfit-chip" data-category="hat" data-value="🤠"
+                            onclick="setOutfit('hat', '🤠')">🤠 Cowboy</button>
+                        <button class="outfit-chip" data-category="hat" data-value="🎉"
+                            onclick="setOutfit('hat', '🎉')">🎉 Party</button>
+                        <button class="outfit-chip" data-category="hat" data-value="🧙"
+                            onclick="setOutfit('hat', '🧙')">🧙 Wizard</button>
+                        <button class="outfit-chip" data-category="hat" data-value="🌸"
+                            onclick="setOutfit('hat', '🌸')">🌸 Flower</button>
+                    </div>
+                </div>
+
+                <div class="outfit-group">
+                    <span class="group-title">Accessories</span>
+                    <div class="outfit-chips">
+                        <button class="outfit-chip" data-category="accessory" data-value="🕶️"
+                            onclick="setOutfit('accessory', '🕶️')">🕶️ Shades</button>
+                        <button class="outfit-chip" data-category="accessory" data-value="🎀"
+                            onclick="setOutfit('accessory', '🎀')">🎀 Bow</button>
+                        <button class="outfit-chip" data-category="accessory" data-value="🧣"
+                            onclick="setOutfit('accessory', '🧣')">🧣 Scarf</button>
+                        <button class="outfit-chip" data-category="accessory" data-value="🪽"
+                            onclick="setOutfit('accessory', '🪽')">🪽 Wings</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Verdict Side Panel Card -->
+        <div class="verdict-card" id="verdictCard">
+            <div class="verdict-header">
+                <h3>Blob's Daily Verdict 👀</h3>
+            </div>
+
+            <div id="verdictLocked" class="verdict-teaser">
+                <div class="lock-icon">🔒</div>
+                <p>Blob will judge your affection later...</p>
+                <button class="reveal-btn" onclick="revealVerdict()">🌙 Reveal Verdict</button>
+            </div>
+
+            <div id="verdictRevealed" class="verdict-content" style="display: none;">
+                <div class="score-badge" id="verdictStats">🍎 0 | 🎾 0 | ✋ 0 | 💤 0</div>
+                <div class="verdict-quote" id="verdictQuote">"You haven't touched me all day. I am emotionally
+                    abandoned."</div>
+
+                <div class="meme-container">
+                    <div class="meme-label">Exhibit A:</div>
+                    <div class="meme-box">
+                        <img id="memeImg" src="meme/1.png" alt="Meme Exhibit"
+                            onload="this.style.display='block'; document.getElementById('memeFallback').style.display='none';"
+                            onerror="handleMemeError(this);">
+                        <div id="memeFallback" class="meme-fallback" style="display: none;">
+                            <span class="meme-icon">🗿</span>
+                            <span class="meme-caption">[ Meme Placeholder ]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="blob-roast-box" id="blobRoast">
+                    <div class="blob-roast-tag">Blob's Roast 🔥</div>
+                    <div class="blob-roast-text" id="blobRoastText">"You haven't interacted with me once."</div>
+                </div>
+
+                <button class="re-lock-btn" onclick="hideVerdict()">🔒 Lock Verdict</button>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        /* =====================================================
+           🎨 REACTION DICTIONARY FOR BLOB
+           ===================================================== */
+        const REACTIONS = {
+            feed: [
+                { face: '😋', caption: "Nom nom nom! Okay, that was actually tasty.", anim: 'squish', particle: '🍎' },
+                { face: '🤤', caption: "More snacks! You know my weak spot.", anim: 'bounce', particle: '🍿' },
+                { face: '😌', caption: "Mmm, acceptable cuisine. I am satisfied.", anim: 'bounce', particle: '✨' },
+                { face: '😏', caption: "Finally. I was starting to worry about you.", anim: 'bounce', particle: '🍪' }
+            ],
+            feedRepeated: [
+                { face: '🧐', caption: "Again? Are you trying to win my affection with snacks?", anim: 'squish', particle: '🍩' },
+                { face: '😒', caption: "I see what you're doing. It's working, but I see it.", anim: 'bounce', particle: '🍕' },
+                { face: '🙃', caption: "Third snack in a row? Bold strategy.", anim: 'squish', particle: '🧁' }
+            ],
+            play: [
+                { face: '🤩', caption: "WHEEE! Best day ever! ...I mean, it's alright.", anim: 'spin', particle: '⭐' },
+                { face: '🥳', caption: "Okay THIS is actually fun! Catch me!", anim: 'bounce', particle: '🎾' },
+                { face: '🤪', caption: "Zoomies engaged! Look at me go!", anim: 'spin', particle: '✨' },
+                { face: '😜', caption: "Don't make it weird, but keep playing!", anim: 'squish', particle: '🎉' }
+            ],
+            pet: [
+                { face: '🥰', caption: "Aww... that's so nice. Purrrr~", anim: 'squish', particle: '💖' },
+                { face: '😊', caption: "I permit this. You may continue petting.", anim: 'bounce', particle: '❤️' },
+                { face: '☺️', caption: "Mmm, head scratches! Right there!", anim: 'squish', particle: '💕' },
+                { face: '🥺', caption: "More belly rubs please? I am just a lil blob.", anim: 'squish', particle: '✨' }
+            ],
+            petSarcastic: [
+                { face: '😐', caption: "Wow. Groundbreaking. A pat on the head.", anim: 'bounce', particle: '✋' },
+                { face: '🙄', caption: "I'll allow it, I suppose.", anim: 'bounce', particle: '💕' },
+                { face: '😏', caption: "Careful, I might start expecting this daily.", anim: 'squish', particle: '💖' }
+            ],
+            sleep: [
+                { face: '😴', caption: "Do not disturb. I am becoming more beautiful.", anim: 'sleepy', particle: '💤' },
+                { face: '🥱', caption: "Napping. This is very important work.", anim: 'sleepy', particle: '🌙' },
+                { face: '😪', caption: "Wake me when something interesting happens.", anim: 'sleepy', particle: '💤' }
+            ],
+            ignored: [
+                { face: '😤', caption: "Excuse me. Am I invisible now?", anim: 'bounce', particle: '❓' },
+                { face: '😑', caption: "I'll just sit here. Ignored. Fine.", anim: 'bounce', particle: '💧' },
+                { face: '😾', caption: "This is exactly the kind of neglect I predicted.", anim: 'squish', particle: '💢' }
+            ],
+            returned: [
+                { face: '😱', caption: "Oh NOW you show up. Where were you?!", anim: 'spin', particle: '❗️' },
+                { face: '🥺', caption: "I thought you left forever. I was dramatic about it.", anim: 'squish', particle: '💧' },
+                { face: '😮', caption: "You're back! Not that I missed you... much.", anim: 'bounce', particle: '✨' }
+            ]
+        };
+
+        /* =====================================================
+           🎨 OUTFIT REACTIONS — each one now has its own face,
+           animation and particle, instead of every outfit change
+           showing the same fixed 🤩 expression.
+           ===================================================== */
+        const OUTFIT_REACTIONS = [
+            { face: '🧐', caption: "Interesting fashion choice.", anim: 'squish', particle: '❓' },
+            { face: '😎', caption: "Finally. Some taste.", anim: 'bounce', particle: '✨' },
+            { face: '😳', caption: "You put THAT on me?", anim: 'squish', particle: '❗️' },
+            { face: '🤩', caption: "I look magnificent.", anim: 'spin', particle: '✨' },
+            { face: '🤨', caption: "I have no idea what you're doing.", anim: 'bounce', particle: '❓' },
+            { face: '😎', caption: "Work it! I am officially an icon.", anim: 'spin', particle: '⭐' },
+            { face: '🙄', caption: "Is this outfit supposed to make me look cute or dramatic?", anim: 'squish', particle: '👗' }
+        ];
+
+        const OUTFIT_REMOVED_REACTIONS = [
+            { face: '😏', caption: "Back to natural raw beauty.", anim: 'squish', particle: '🍃' },
+            { face: '😌', caption: "Ahh, freedom. No more accessories weighing me down.", anim: 'bounce', particle: '🍃' },
+            { face: '🙂', caption: "Plain and simple. Still iconic, obviously.", anim: 'squish', particle: '✨' }
+        ];
+
+        const TIMING = {
+            judgyAfterFeeds: 3,
+            ignoreAfterMs: 15000,
+            returnAfterMs: 10000
+        };
+
+        const face = document.getElementById('face');
+        const speech = document.getElementById('speech');
+        const petEl = document.getElementById('pet');
+        const stageEl = document.getElementById('stage');
+        const moodBadge = document.getElementById('moodBadge');
+        const outfitHat = document.getElementById('outfitHat');
+        const outfitAcc = document.getElementById('outfitAcc');
+
+        let feedStreak = 0;
+        let lastButtonType = null;
+        let consecutiveCount = 0;
+        let ignoreTimer = null;
+        let hiddenAt = null;
+
+        // Local calendar date utility (YYYY-MM-DD)
+        function getLocalDateStr() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        const today = getLocalDateStr();
+
+        let memory = JSON.parse(localStorage.getItem('blobMemory'));
+
+        if (!memory || memory.date !== today) {
+            memory = {
+                date: today,
+                feed: 0,
+                play: 0,
+                pet: 0,
+                sleep: 0,
+                mood: "😏 Sassy",
+                outfit: { hat: null, accessory: null },
+                consecutiveSpam: 0
+            };
+            localStorage.setItem('blobMemory', JSON.stringify(memory));
+        }
+
+        if (!memory.outfit) {
+            memory.outfit = { hat: null, accessory: null };
+        }
+
+        function pickRandom(list) {
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function spawnParticle(emoji) {
+            if (!emoji) return;
+            const particle = document.createElement('div');
+            particle.className = 'floating-emote';
+            particle.textContent = emoji;
+            const randomX = (Math.random() - 0.5) * 60;
+            particle.style.left = `calc(50% + ${randomX}px)`;
+            particle.style.top = '100px';
+            stageEl.appendChild(particle);
+            setTimeout(() => particle.remove(), 1000);
+        }
+
+        function showReaction(entry) {
+            if (entry.image) {
+                face.innerHTML = '<img src="' + entry.image + '" alt="" style="width:90px;height:90px;object-fit:contain;">';
+            } else {
+                face.textContent = entry.face;
+            }
+
+            speech.textContent = entry.caption;
+
+            petEl.classList.remove('bounce', 'squish', 'spin', 'sleepy');
+            void petEl.offsetWidth;
+
+            const animationClass = entry.anim || 'bounce';
+            petEl.classList.add(animationClass);
+
+            if (entry.particle) {
+                spawnParticle(entry.particle);
+                spawnParticle(entry.particle);
+            }
+        }
+
+        function resetIgnoreTimer() {
+            clearTimeout(ignoreTimer);
+            ignoreTimer = setTimeout(function () {
+                setMood('🥺 Neglected');
+                showReaction(pickRandom(REACTIONS.ignored));
+            }, TIMING.ignoreAfterMs);
+        }
+
+        // Tells the CSS which "attachment point" to use for the current accessory,
+        // since sunglasses/bow/scarf/wings each need a different position on Blob.
+        const ACCESSORY_POSITION_CLASS = {
+            '🕶️': 'acc-shades',
+            '🎀': 'acc-bow',
+            '🧣': 'acc-scarf',
+            '🪽': 'acc-wings'
+        };
+
+        function updateOutfitDisplay() {
+            if (outfitHat) outfitHat.textContent = memory.outfit.hat || '';
+            if (outfitAcc) {
+                outfitAcc.textContent = memory.outfit.accessory || '';
+                const posClass = ACCESSORY_POSITION_CLASS[memory.outfit.accessory] || '';
+                outfitAcc.className = 'outfit-acc' + (posClass ? ' ' + posClass : '');
+            }
+
+            // Update active state on outfit chips (matched by exact stored
+            // value now, not by scanning the button's visible text)
+            document.querySelectorAll('.outfit-chip').forEach(btn => {
+                const category = btn.dataset.category;
+                const value = btn.dataset.value;
+                const isActive = (category === 'hat' && memory.outfit.hat === value) ||
+                    (category === 'accessory' && memory.outfit.accessory === value);
+                btn.classList.toggle('active', isActive);
+            });
+        }
+
+        function setOutfit(category, emoji) {
+            resetIgnoreTimer();
+            if (category === 'none') {
+                memory.outfit = { hat: null, accessory: null };
+            } else if (category === 'hat') {
+                memory.outfit.hat = (memory.outfit.hat === emoji) ? null : emoji;
+            } else if (category === 'accessory') {
+                memory.outfit.accessory = (memory.outfit.accessory === emoji) ? null : emoji;
+            }
+
+            updateOutfitDisplay();
+            localStorage.setItem('blobMemory', JSON.stringify(memory));
+
+            if (category !== 'none' && (memory.outfit.hat || memory.outfit.accessory)) {
+                showReaction(pickRandom(OUTFIT_REACTIONS));
+                setMood('🤩 Ecstatic');
+            } else {
+                showReaction(pickRandom(OUTFIT_REMOVED_REACTIONS));
+                setMood('😏 Sassy');
+            }
+
+            calculateVerdict();
+        }
+
+        function setMood(moodStr) {
+            memory.mood = moodStr;
+            if (moodBadge) moodBadge.textContent = moodStr;
+            localStorage.setItem('blobMemory', JSON.stringify(memory));
+        }
+
+        function evaluateMood() {
+            const total = memory.feed + memory.play + memory.pet + memory.sleep;
+
+            if (consecutiveCount >= 4) {
+                setMood('😒 Annoyed');
+                return;
+            }
+
+            if (lastButtonType === 'sleep') {
+                setMood('😴 Sleepy');
+                return;
+            }
+
+            if (total >= 10 && (memory.feed > 0 && memory.play > 0 && memory.pet > 0)) {
+                setMood('🤩 Ecstatic');
+                return;
+            }
+
+            if (total >= 4) {
+                setMood('😊 Happy');
+                return;
+            }
+
+            setMood('😏 Sassy');
+        }
+
+        function react(type) {
+            resetIgnoreTimer();
+
+            if (type === lastButtonType) {
+                consecutiveCount++;
+            } else {
+                lastButtonType = type;
+                consecutiveCount = 1;
+            }
+
+            if (consecutiveCount > (memory.consecutiveSpam || 0)) {
+                memory.consecutiveSpam = consecutiveCount;
+            }
+
+            if (memory[type] !== undefined) {
+                memory[type]++;
+            }
+
+            evaluateMood();
+
+            if (type === 'feed') {
+                feedStreak++;
+                const pool = feedStreak >= TIMING.judgyAfterFeeds ? REACTIONS.feedRepeated : REACTIONS.feed;
+                showReaction(pickRandom(pool));
+            } else {
+                feedStreak = 0;
+                if (type === 'pet') {
+                    const pool = Math.random() < 0.5 ? REACTIONS.pet : REACTIONS.petSarcastic;
+                    showReaction(pickRandom(pool));
+                } else {
+                    showReaction(pickRandom(REACTIONS[type]));
+                }
+            }
+
+            calculateVerdict();
+        }
+
+        function resolveMemePath(memePath) {
+            if (!memePath) return '';
+            const pathname = window.location.pathname || '';
+            const isSubfolder = pathname.includes('/version 1/') || pathname.includes('\\version 1\\') || pathname.includes('/version%201/');
+            if (isSubfolder && memePath.startsWith('meme/')) {
+                return '../' + memePath;
+            }
+            return memePath;
+        }
+
+        function handleMemeError(img) {
+            const rawSrc = img.getAttribute('src') || '';
+            if (rawSrc && !rawSrc.startsWith('../') && rawSrc.startsWith('meme/')) {
+                img.src = '../' + rawSrc;
+            } else {
+                img.style.display = 'none';
+                const fallback = document.getElementById('memeFallback');
+                if (fallback) fallback.style.display = 'flex';
+            }
+        }
+
+        /* =====================================================
+           🖼️ MEME COLLECTION BY RELATIONSHIP CATEGORY
+           ===================================================== */
+        const MEME_CATEGORIES = {
+            best_buddy: ["meme/1.png", "meme/2.webp", "meme/4.jpg", "meme/5.jpg", "meme/6.jpg"],
+            fashionista: ["meme/7.jpg", "meme/8.jpg", "meme/9.jpg", "meme/10.jpg", "meme/11.jpg"],
+            food_obsessed: ["meme/12.jpg", "meme/13.jpg", "meme/14.jpg", "meme/15.jpg", "meme/16.jpg"],
+            spammer: ["meme/17.jpg", "meme/18.jpg", "meme/19.jpg", "meme/20.jpg", "meme/1.png"],
+            negligent: ["meme/21.jpg", "meme/22.jpg", "meme/4.jpg", "meme/5.jpg"]
+        };
+
+        /* =====================================================
+           🔥 BLOB'S SARCASTIC RELATIONSHIP VERDICTS & ROASTS
+           ===================================================== */
+        const VERDICTS = {
+            negligent: {
+                quote: '"You ignored me almost all day. I am emotionally abandoned. 🥺"',
+                roasts: [
+                    "You opened this tab and treated me like a browser ornament.",
+                    "Zero affection today. Blob is considering getting a new owner.",
+                    "Neither snacks nor head scratches. You are a cold monster."
+                ]
+            },
+            food_obsessed: {
+                quote: '"You fed me constantly but barely played. Am I your emotional support lunchbox? 🍎"',
+                roasts: [
+                    "You think food solves all problems. Blob is full and judgey.",
+                    "Snack after snack... do you know any other interaction buttons?",
+                    "Blob is now 90% apple seeds thanks to your feeding addiction."
+                ]
+            },
+            spammer: {
+                quote: '"You kept clicking the exact same button. Are you testing my patience? 😤"',
+                roasts: [
+                    "Clicking the same button 10 times doesn't make me love you more.",
+                    "Repeated button spam detected. Your creativity is astounding.",
+                    "Blob is annoyed by your frantic clicking technique."
+                ]
+            },
+            fashionista: {
+                quote: '"You dressed me up like a doll. I look magnificent, but suspicious. 😏"',
+                roasts: [
+                    "You put a whole outfit on me and stared. Fashion icon status achieved.",
+                    "Dressed me as royalty just to sit on a webpage.",
+                    "I look incredible, no thanks to your questionable styling choices."
+                ]
+            },
+            best_buddy: {
+                quote: '"You fed, played, petted, and loved me! I\'m almost proud. ✨"',
+                roasts: [
+                    "A balanced diet of snacks and attention! Don't get used to this praise.",
+                    "Look at you being a competent pet owner today. Shocking.",
+                    "Blob approves of today's attention. Keep up the good work."
+                ]
+            }
+        };
+
+        function getDaySeed(dateStr) {
+            return dateStr.split('-').reduce((acc, part) => acc + parseInt(part, 10), 0);
+        }
+
+        function calculateVerdict() {
+            const statsBadge = document.getElementById('verdictStats');
+            const quoteEl = document.getElementById('verdictQuote');
+            const memeImg = document.getElementById('memeImg');
+            const roastTextEl = document.getElementById('blobRoastText');
+            if (!quoteEl) return;
+
+            const total = memory.feed + memory.play + memory.pet + memory.sleep;
+
+            if (statsBadge) {
+                statsBadge.textContent = `🍎 ${memory.feed} | 🎾 ${memory.play} | ✋ ${memory.pet} | 💤 ${memory.sleep}`;
+            }
+
+            let cat = "negligent";
+
+            if (total === 0) {
+                cat = "negligent";
+            } else if (memory.consecutiveSpam >= 5) {
+                cat = "spammer";
+            } else if (memory.outfit && (memory.outfit.hat || memory.outfit.accessory) && total >= 3) {
+                cat = "fashionista";
+            } else if (memory.feed >= (total / 2) && memory.feed >= 4) {
+                cat = "food_obsessed";
+            } else if (total >= 8 && memory.feed > 0 && memory.play > 0 && memory.pet > 0) {
+                cat = "best_buddy";
+            } else {
+                cat = "negligent";
+            }
+
+            const verdictData = VERDICTS[cat];
+            quoteEl.textContent = verdictData.quote;
+
+            const daySeed = getDaySeed(today);
+            const catMemes = MEME_CATEGORIES[cat] || MEME_CATEGORIES.negligent;
+            const memeIndex = daySeed % catMemes.length;
+            const selectedMeme = catMemes[memeIndex];
+
+            if (memeImg) {
+                const finalPath = resolveMemePath(selectedMeme);
+                memeImg.style.display = 'block';
+                const fallback = document.getElementById('memeFallback');
+                if (fallback) fallback.style.display = 'none';
+                memeImg.src = finalPath;
+            }
+
+            if (roastTextEl) {
+                const roastPool = verdictData.roasts;
+                const roastIndex = daySeed % roastPool.length;
+                const selectedRoast = roastPool[roastIndex];
+                roastTextEl.textContent = `"${selectedRoast}"`;
+            }
+
+            localStorage.setItem('blobMemory', JSON.stringify(memory));
+        }
+
+        function revealVerdict() {
+            resetIgnoreTimer();
+            calculateVerdict();
+            document.getElementById('verdictLocked').style.display = 'none';
+            document.getElementById('verdictRevealed').style.display = 'flex';
+            showReaction({ face: '🧐', caption: "Judgement time! Here is my official verdict.", anim: 'squish', particle: '👀' });
+        }
+
+        function hideVerdict() {
+            resetIgnoreTimer();
+            document.getElementById('verdictLocked').style.display = 'flex';
+            document.getElementById('verdictRevealed').style.display = 'none';
+        }
+
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                hiddenAt = Date.now();
+            } else if (hiddenAt) {
+                const awayMs = Date.now() - hiddenAt;
+                if (awayMs > TIMING.returnAfterMs) {
+                    setMood('😒 Annoyed');
+                    showReaction(pickRandom(REACTIONS.returned));
+                }
+                hiddenAt = null;
+                resetIgnoreTimer();
+            }
+        });
+
+        // Initialize state
+        setMood(memory.mood || "😏 Sassy");
+        updateOutfitDisplay();
+        resetIgnoreTimer();
+        calculateVerdict();
+
+        /* =====================================================
+           🐤 WANDERING DUCKS WITH CURSOR REPULSION EFFECT
+           ===================================================== */
+        function initWanderingDucks() {
+            const DUCK_COUNT = 7;
+            const EMOJIS = ['🐥', '🐤', '🐥', '🐤', '🐥', '🐤', '🐥'];
+            const ducks = [];
+
+            let mouseX = -1000;
+            let mouseY = -1000;
+            const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+            if (!isTouch) {
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+                window.addEventListener('mouseleave', () => {
+                    mouseX = -1000;
+                    mouseY = -1000;
+                });
+            }
+
+            for (let i = 0; i < DUCK_COUNT; i++) {
+                const duck = document.createElement('div');
+                duck.className = 'wandering-duck';
+                duck.textContent = EMOJIS[i % EMOJIS.length];
+                document.body.appendChild(duck);
+
+                let posX = 20 + Math.random() * (window.innerWidth - 80);
+                let posY = 20 + Math.random() * (window.innerHeight - 80);
+
+                const duckData = {
+                    element: duck,
+                    x: posX,
+                    y: posY,
+                    targetX: posX,
+                    targetY: posY,
+                    pushX: 0,
+                    pushY: 0,
+                    scaleX: 1,
+                    speed: 0.8 + Math.random() * 0.6
+                };
+                ducks.push(duckData);
+
+                // Start staggered target selection
+                setTimeout(() => pickNewWanderTarget(duckData), i * 600);
+            }
+
+            function pickNewWanderTarget(duckData) {
+                const padding = 30;
+                duckData.targetX = padding + Math.random() * (window.innerWidth - 90);
+                duckData.targetY = padding + Math.random() * (window.innerHeight - 90);
+
+                const nextMoveMs = 3500 + Math.random() * 4500;
+                setTimeout(() => pickNewWanderTarget(duckData), nextMoveMs);
+            }
+
+            function updateDucks() {
+                const REPULSION_RADIUS = 140;
+                const PUSH_STRENGTH = 6;
+
+                ducks.forEach(duck => {
+                    // Wander interpolation
+                    const wanderDx = duck.targetX - duck.x;
+                    const wanderDy = duck.targetY - duck.y;
+                    duck.x += wanderDx * 0.012 * duck.speed;
+                    duck.y += wanderDy * 0.012 * duck.speed;
+
+                    // Cursor Repulsion Force (Desktop only)
+                    if (!isTouch && mouseX > 0 && mouseY > 0) {
+                        const dx = duck.x - mouseX;
+                        const dy = duck.y - mouseY;
+                        const dist = Math.hypot(dx, dy);
+
+                        if (dist < REPULSION_RADIUS && dist > 0) {
+                            const force = (1 - dist / REPULSION_RADIUS) * PUSH_STRENGTH;
+                            duck.pushX += (dx / dist) * force;
+                            duck.pushY += (dy / dist) * force;
+                        }
+                    }
+
+                    // Friction/damping on push
+                    duck.pushX *= 0.88;
+                    duck.pushY *= 0.88;
+
+                    let finalX = duck.x + duck.pushX;
+                    let finalY = duck.y + duck.pushY;
+
+                    // Clamp within viewport
+                    finalX = Math.max(15, Math.min(window.innerWidth - 60, finalX));
+                    finalY = Math.max(15, Math.min(window.innerHeight - 60, finalY));
+
+                    // Direction face flip based on horizontal velocity
+                    const netVelocityX = (duck.targetX - duck.x) * 0.012 + duck.pushX;
+                    if (Math.abs(netVelocityX) > 0.2) {
+                        duck.scaleX = netVelocityX < 0 ? -1 : 1;
+                    }
+
+                    duck.element.style.left = `${finalX}px`;
+                    duck.element.style.top = `${finalY}px`;
+                    duck.element.style.transform = `scaleX(${duck.scaleX})`;
+                });
+
+                requestAnimationFrame(updateDucks);
+            }
+
+            requestAnimationFrame(updateDucks);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWanderingDucks);
+        } else {
+            initWanderingDucks();
+        }
+    </script>
+</body>
+
+</html>
