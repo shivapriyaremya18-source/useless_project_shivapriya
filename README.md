@@ -6,92 +6,75 @@
 
 
 ## Basic Details
-### Team Name: [Name]
+### Team Name: Shivapriya
 
 
 ### Team Members
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: Shivapriya jayan - college of engineering , perumon
 
 ### Project Description
-[2-3 lines about what your project does]
+Blob the Pet is a completely unnecessary virtual pet that lives on your webpage and judges how you treat it. Feed it, play with it, pet it, dress it up, or ignore it—and Blob will remember your behavior for 24 hours and give you a ridiculous Daily Verdict.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+Traditional pets require food, care, attention, and responsibility. Blob solves the much more important problem of having a judgmental blob demanding attention without providing any actual usefulness.
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+Blob gives users a tiny digital creature with moods, outfits, reactions, memories, memes, and completely unnecessary opinions.
+
+Interact with Blob throughout the day and it keeps track of what you did. At the end, Blob delivers a Daily Verdict, complete with a sarcastic roast and a meme as evidence.
+
+Because apparently being judged by a blob is entertainment now.
 
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+- HTML, CSS, JavaScript
+- None
+- Tools: Antigravity, Claude, Web Browser
+- Assets: Emoji-based character/outfit elements and meme image assets
 
 For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
+- None
 
 ### Implementation
 For Software:
 # Installation
-[commands]
+No installation or external dependencies are required.
+
+Open the project HTML file in a modern web browser.
 
 # Run
-[commands]
+Open the HTML file in a browser and interact with Blob.
+
+Feed, play with, pet, sleep, or dress Blob and watch its mood and reactions change.
 
 ### Project Documentation
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+![<img width="1920" height="1020" alt="1" src="https://github.com/user-attachments/assets/9edbe82d-e01d-409b-a1b1-dd9d71925b81" />
+](basic overview)
+Main Blob interface showing the virtual pet, interaction buttons, mood, and overall interface.
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+
+![<img width="1920" height="1020" alt="2" src="https://github.com/user-attachments/assets/0798e186-7bbc-4ad7-a1a1-69c3a0833c35" />
+](smaller details)
+Blob's outfit section showing the different accessories and outfits available for the pet.
+
+
+![<img width="1920" height="1020" alt="3" src="https://github.com/user-attachments/assets/1ba39404-5766-40b4-8883-d73ec2b4c9e2" />
+](judgement)
+Daily Verdict showing Blob's judgment, interaction statistics, roast, and meme evidence.
 
 # Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Add caption explaining your workflow*
+![Workflow]
 
+Basic workflow showing user interaction → Blob's memory → mood/verdict calculation → Daily Verdict and meme.
 For Hardware:
 
-# Schematic & Circuit
-![Circuit](Add your circuit diagram here)
-*Add caption explaining connections*
-
-![Schematic](Add your schematic diagram here)
-*Add caption explaining the schematic*
-
-# Build Photos
-![Components](Add photo of your components here)
-*List out all components shown*
-
-![Build](Add photos of build process here)
-*Explain the build steps*
-
-![Final](Add photo of final product here)
-*Explain the final build*
-
-### Project Demo
-# Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
-
-# Additional Demos
-[Add any extra demo materials/links]
-
 ## Team Contributions
-- [Name 1]: [Specific contributions]
-- [Name 2]: [Specific contributions]
-- [Name 3]: [Specific contributions]
+- [Name 1]: Project concept, UI/UX design, feature planning, implementation, testing, interaction design, Blob's personality, verdict system, outfit system, and overall project development.
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 
